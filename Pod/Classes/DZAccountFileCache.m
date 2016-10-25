@@ -8,6 +8,8 @@
 
 #import "DZAccountFileCache.h"
 #import "DZFileUtils.h"
+#import "DZAuthSession.h"
+#import "YHAccountData.h"
 @interface DZAccountFileCache()
 {
     NSMutableDictionary* _cacheContainer;
@@ -16,6 +18,13 @@
 @end
 
 @implementation DZAccountFileCache
++ (DZAccountFileCache*) activeCache
+{
+   return   [[YHAccountData shareFactory] shareInstanceFor:[self class] withInitBlock:^(DZAccountFileCache* cache) {
+        [cache initWithRootPath:DZDocumentsSubPath(DZActiveAuthSession.userID)];
+    }];
+}
+
 - (instancetype) initWithRootPath:(NSString *)rootPath
 {
     self = [super init];

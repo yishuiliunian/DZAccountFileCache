@@ -11,6 +11,7 @@
 #import "DZFileCodecInterface.h"
 #import "DZCacheJSONCodec.h"
 @interface DZAccountFileCache : NSObject
++ (DZAccountFileCache*) activeCache;
 @property (nonatomic, strong, readonly) NSString* rootPath;
 - (instancetype) initWithRootPath:(NSString*)rootPath;
 - (DZFileCache*) fileCacheWithName:(NSString*)fileName codec:(id<DZFileCodecInterface>)codec;
