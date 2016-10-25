@@ -10,6 +10,7 @@
 #import "DZFileUtils.h"
 #import "DZAuthSession.h"
 #import "YHAccountData.h"
+#import "DZLogger.h"
 @interface DZAccountFileCache()
 {
     NSMutableDictionary* _cacheContainer;
@@ -35,12 +36,13 @@
     _threadLock = [[NSRecursiveLock alloc] init];
     _cacheContainer = [NSMutableDictionary new];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reciveMemoryWaringNotification:) name:UIApplicationDidReceiveMemoryWarningNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(flushAllCache) name:UIApplicationWillResignActiveNotification object:nil];
     return self;
 }
 
 - (DZFileCache*) fileCacheWithName:(NSString *)fileName codec:(id<DZFileCodecInterface>)codec
 {
-    NSString* filePath = DZFileInSubPath(_rootPath, fileName);
+    NSString* filePath = DZPathJoin(_rootPath, fileName);
     [_threadLock lock];
     DZFileCache* cache = [_cacheContainer objectForKey:filePath];
     if (!cache) {
@@ -59,4 +61,16 @@
     [_threadLock unlock];
 }
 
+- (void) flushAllCache
+{
+    [_threadLock lock];
+    for (DZFileCache* cache in _cacheContainer.allValues) {
+        NSError* error;
+        if(![cache flush:&error])
+        {
+            DDLogError(@"缓存%@写入失败%@", cache.filePath, error);
+        };
+    }
+    [_threadLock unlock];
+}
 @end
