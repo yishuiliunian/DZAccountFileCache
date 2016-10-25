@@ -10,6 +10,8 @@
 #import "DZFileCache.h"
 #import "DZFileCodecInterface.h"
 #import "DZCacheJSONCodec.h"
+#import "DZCacheArrayModelCodec.h"
+
 @interface DZAccountFileCache : NSObject
 + (DZAccountFileCache*) activeCache;
 @property (nonatomic, strong, readonly) NSString* rootPath;
