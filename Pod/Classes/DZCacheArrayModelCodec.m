@@ -41,7 +41,6 @@
             [decodeArray addObject:object];
         }
     }
-    
     return decodeArray;
 }
 
@@ -66,6 +65,6 @@
         NSDictionary* dic = [ob yy_modelToJSONObject];
         [encodeArray addObject:dic];
     }
-    return encodeArray;
+    return [encodeArray yy_modelToJSONData];
 }
 @end
