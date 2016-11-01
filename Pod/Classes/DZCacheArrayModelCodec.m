@@ -67,4 +67,9 @@
     }
     return [encodeArray yy_modelToJSONData];
 }
+
+- (NSString*) fileCodecVersion
+{
+    return @"1.0.0";
+}
 @end

@@ -13,4 +13,6 @@
 - (id) decode:(NSData*)data error:(NSError* __autoreleasing*)error;
 //对数据进行解码 id --> NSData
 - (NSData*) encode:(id)object error:(NSError* __autoreleasing*)error;
+//
+- (NSString*) fileCodecVersion;
 @end

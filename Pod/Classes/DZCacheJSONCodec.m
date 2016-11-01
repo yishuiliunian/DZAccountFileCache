@@ -18,4 +18,9 @@
 {
    return  [NSJSONSerialization dataWithJSONObject:object options:0 error:error];
 }
+
+- (NSString*) fileCodecVersion
+{
+    return @"1.0.0";
+}
 @end

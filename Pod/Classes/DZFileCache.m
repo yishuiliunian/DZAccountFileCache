@@ -8,6 +8,8 @@
 
 #import "DZFileCache.h"
 
+static NSString* const kDZFileCacheData = @"data";
+static NSString* const kDZFileCacheVersion = @"version";
 @interface DZFileCache ()
 {
     id _lastCachedObject;
@@ -84,8 +86,24 @@
             return NO;
         }
     }
-
-    if(![data writeToFile:_filePath options:NSDataWritingAtomic error:error]) {
+    NSMutableDictionary* fileDic = [NSMutableDictionary new];
+    fileDic[kDZFileCacheData] =[data base64EncodedStringWithOptions:NSDataBase64EncodingEndLineWithLineFeed];
+    
+    NSString* version = [_codec fileCodecVersion];
+    fileDic[kDZFileCacheVersion] = version;
+    
+    NSData* fileData = [NSJSONSerialization dataWithJSONObject:fileDic options:0 error:error];
+    if (error != NULL && *error != nil) {
+        return NO;
+    }
+    if (fileData == nil) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:@"com.dzpqzb.error.filecache" code:-99 userInfo:@{NSLocalizedDescriptionKey:@"文件数据要编码失败!"}];
+            
+        }
+        return NO;
+    }
+    if(![fileData writeToFile:_filePath options:NSDataWritingAtomic error:error]) {
         return NO;
     }
     _lastCachedObjectChanged = NO;
@@ -115,7 +133,22 @@
     if (!data) {
         return nil;
     }
-    id object = [_codec decode:data error:error];
+    NSDictionary* dic = [NSJSONSerialization JSONObjectWithData:data options:0 error:error];
+    if (error != NULL && *error != nil) {
+        return nil;
+    }
+    if (dic == nil) {
+        return nil;
+    }
+    NSString* contentString = dic[kDZFileCacheData];
+    NSData* contentData  = [[NSData alloc] initWithBase64EncodedString:contentString options:NSDataBase64EncodingEndLineWithLineFeed];
+    NSString* version = dic[kDZFileCacheVersion];
+    
+    if (version && ![version isEqualToString:[_codec fileCodecVersion]]) {
+        [[NSFileManager defaultManager] removeItemAtPath:_filePath error:nil];
+        return nil;
+    }
+    id object = [_codec decode:contentData error:error];
     if (error != NULL && *error != nil) {
         return nil;
     }

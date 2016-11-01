@@ -20,6 +20,7 @@
 @property (nonatomic, weak) id<DZFileCacheManageDelegate> manageDelegate;
 @property (nonatomic, strong, readonly) NSString* filePath;
 @property (nonatomic, strong, readonly) id<DZFileCodecInterface> codec;
+@property (nonatomic, strong) NSString* contentVersion;
 @property (nonatomic, strong) id lastCachedObject;
 - (instancetype) initWithFilePath:(NSString*)path codec:(id<DZFileCodecInterface>)codec;
 - (BOOL) flush:(NSError *__autoreleasing *)error;
