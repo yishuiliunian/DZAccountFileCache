@@ -137,6 +137,10 @@ static NSString* const kDZFileCacheVersion = @"version";
     if (error != NULL && *error != nil) {
         return nil;
     }
+    if (![dic isKindOfClass:[NSDictionary class]]) {
+        [[NSFileManager defaultManager] removeItemAtPath:_filePath error:nil];
+        return nil;
+    }
     if (dic == nil) {
         return nil;
     }
