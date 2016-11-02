@@ -87,7 +87,7 @@ static NSString* const kDZFileCacheVersion = @"version";
         }
     }
     NSMutableDictionary* fileDic = [NSMutableDictionary new];
-    fileDic[kDZFileCacheData] =[data base64EncodedStringWithOptions:NSDataBase64EncodingEndLineWithLineFeed];
+    fileDic[kDZFileCacheData] =[data base64EncodedStringWithOptions:0];
     
     NSString* version = [_codec fileCodecVersion];
     fileDic[kDZFileCacheVersion] = version;
@@ -145,7 +145,7 @@ static NSString* const kDZFileCacheVersion = @"version";
         return nil;
     }
     NSString* contentString = dic[kDZFileCacheData];
-    NSData* contentData  = [[NSData alloc] initWithBase64EncodedString:contentString options:NSDataBase64EncodingEndLineWithLineFeed];
+    NSData* contentData  = [[NSData alloc] initWithBase64EncodedString:contentString options:0];
     NSString* version = dic[kDZFileCacheVersion];
     
     if (version && ![version isEqualToString:[_codec fileCodecVersion]]) {
