@@ -78,12 +78,17 @@ static NSString* const kDZFileCacheVersion = @"version";
         return NO;
     }
     if (data == nil) {
-        if([[NSFileManager defaultManager] removeItemAtPath:_filePath error:error])
-        {
+        if ([[NSFileManager defaultManager] fileExistsAtPath:_filePath]) {
+            if([[NSFileManager defaultManager] removeItemAtPath:_filePath error:error])
+            {
+                _lastCachedObjectChanged = NO;
+                return YES;
+            } else {
+                return NO;
+            }
+        } else {
             _lastCachedObjectChanged = NO;
             return YES;
-        } else {
-            return NO;
         }
     }
     NSMutableDictionary* fileDic = [NSMutableDictionary new];
