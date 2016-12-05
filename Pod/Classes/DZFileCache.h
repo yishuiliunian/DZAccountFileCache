@@ -26,4 +26,5 @@
 - (BOOL) flush:(NSError *__autoreleasing *)error;
 - (id) dumpObject:(NSError* __autoreleasing*)error;
 - (void) close;
+- (void) unloadMemory;
 @end

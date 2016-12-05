@@ -14,6 +14,7 @@ static NSString* const kDZFileCacheVersion = @"version";
 {
     id _lastCachedObject;
     BOOL _lastCachedObjectChanged;
+    NSRecursiveLock * _lock;
 }
 @end
 
@@ -33,25 +34,30 @@ static NSString* const kDZFileCacheVersion = @"version";
     _filePath = path;
     _codec = codec;
     _lastCachedObjectChanged = NO;
+    _lock = [NSRecursiveLock new];
     return self;
 }
 
 - (id) lastCachedObject
 {
+    [_lock lock];
     if (!_lastCachedObject) {
         NSError* error = nil;
-        _lastCachedObject = [self dumpObject:&error];
+        id object = [self dumpObject:&error];
         _lastCachedObjectChanged = YES;
     }
+    [_lock unlock];
     return _lastCachedObject;
 }
 
 - (void) setLastCachedObject:(id)lastCachedObject
 {
+    [_lock lock];
     if (lastCachedObject != _lastCachedObject) {
         _lastCachedObject = lastCachedObject;
         _lastCachedObjectChanged = YES;
     }
+    [_lock unlock];
 }
 
 
@@ -69,11 +75,14 @@ static NSString* const kDZFileCacheVersion = @"version";
         }
         return NO;
     }
-
-    if (!_lastCachedObjectChanged) {
+    [_lock lock];
+    BOOL  changed = _lastCachedObject;
+    id object  = _lastCachedObject;
+    [_lock unlock];
+    if (!changed) {
         return YES;
     }
-    NSData* data = [_codec encode:_lastCachedObject error:error];
+    NSData* data = [_codec encode:object error:error];
     if (error != NULL && *error != nil) {
         return NO;
     }
@@ -81,13 +90,17 @@ static NSString* const kDZFileCacheVersion = @"version";
         if ([[NSFileManager defaultManager] fileExistsAtPath:_filePath]) {
             if([[NSFileManager defaultManager] removeItemAtPath:_filePath error:error])
             {
-                _lastCachedObjectChanged = NO;
+                [_lock lock];
+                _lastCachedObjectChanged= NO;
+                [_lock unlock];;
                 return YES;
             } else {
                 return NO;
             }
         } else {
+            [_lock lock];
             _lastCachedObjectChanged = NO;
+            [_lock unlock];
             return YES;
         }
     }
@@ -111,7 +124,9 @@ static NSString* const kDZFileCacheVersion = @"version";
     if(![fileData writeToFile:_filePath options:NSDataWritingAtomic error:error]) {
         return NO;
     }
+    [_lock lock];
     _lastCachedObjectChanged = NO;
+    [_lock unlock];
     return YES;
 }
 
@@ -171,5 +186,11 @@ static NSString* const kDZFileCacheVersion = @"version";
     if ([self.manageDelegate respondsToSelector:@selector(fileCacheWillClose:)]) {
         [self.manageDelegate fileCacheWillClose:self];
     }
+}
+
+- (void)unloadMemory {
+    [_lock lock];
+    _lastCachedObject = nil;
+    [_lock unlock];
 }
 @end

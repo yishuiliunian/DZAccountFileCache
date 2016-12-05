@@ -37,6 +37,8 @@
     _cacheContainer = [NSMutableDictionary new];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reciveMemoryWaringNotification:) name:UIApplicationDidReceiveMemoryWarningNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(flushAllCache) name:UIApplicationWillResignActiveNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(flushAllCache) name:UIApplicationWillTerminateNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(flushAllCache) name:UIApplicationDidEnterBackgroundNotification object:nil];
     return self;
 }
 
@@ -56,8 +58,12 @@
 - (void) reciveMemoryWaringNotification:(NSNotificationCenter*)notification
 {
     [_threadLock lock];
-    NSArray* allKeys = [_cacheContainer allKeys];
-    [_cacheContainer removeAllObjects];
+    for (DZFileCache * cache in _cacheContainer) {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH,0) , ^{
+            [cache flush:nil];
+            [cache unloadMemory];
+        });
+    }
     [_threadLock unlock];
 }
 
