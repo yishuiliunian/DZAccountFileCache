@@ -58,7 +58,7 @@
 - (void) reciveMemoryWaringNotification:(NSNotificationCenter*)notification
 {
     [_threadLock lock];
-    for (DZFileCache * cache in _cacheContainer) {
+    for (DZFileCache * cache in _cacheContainer.allValues) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH,0) , ^{
             [cache flush:nil];
             [cache unloadMemory];
