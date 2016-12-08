@@ -44,6 +44,7 @@ static NSString* const kDZFileCacheVersion = @"version";
     if (!_lastCachedObject) {
         NSError* error = nil;
         id object = [self dumpObject:&error];
+        _lastCachedObject = object;
         _lastCachedObjectChanged = YES;
     }
     [_lock unlock];
