@@ -19,7 +19,7 @@
 }
 - (id) decode:(NSData *)data error:(NSError *__autoreleasing *)error
 {
-    NSDictionary * dictionary = [data yy_modelToJSONObject];
+    NSDictionary * dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:error];
     if (![dictionary isKindOfClass:[NSDictionary class]]) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:@"com.dzpqzb.codec" code:-88 userInfo:@{NSLocalizedDescriptionKey:@"输入的数据类型不是Dictionary"}];
