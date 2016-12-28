@@ -22,9 +22,15 @@
 @property (nonatomic, strong, readonly) id<DZFileCodecInterface> codec;
 @property (nonatomic, strong) NSString* contentVersion;
 @property (nonatomic, strong) id lastCachedObject;
+//
 - (instancetype) initWithFilePath:(NSString*)path codec:(id<DZFileCodecInterface>)codec;
 - (BOOL) flush:(NSError *__autoreleasing *)error;
 - (id) dumpObject:(NSError* __autoreleasing*)error;
 - (void) close;
 - (void) unloadMemory;
+@end
+
+@interface DZFileCache (Convience)
+@property  (nonatomic, strong, getter=lastCachedObject, setter=setLastCachedObject:) NSArray * cachedArray;
+@property  (nonatomic, strong, getter=lastCachedObject, setter=setLastCachedObject:) NSDictionary* cachedDictionary;
 @end

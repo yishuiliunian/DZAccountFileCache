@@ -40,7 +40,7 @@
 
 - (NSData*) encode:(id)object error:(NSError *__autoreleasing *)error
 {
-    if ([object isKindOfClass:[NSDictionary class]]) {
+    if (![object isKindOfClass:[NSDictionary class]]) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:@"com.dzpqzb.codec" code:-88 userInfo:@{NSLocalizedDescriptionKey:@"输入的数据类型不是Dictionary"}];
         }
